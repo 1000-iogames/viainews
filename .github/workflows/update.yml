@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Ensures full history is fetched for merging
+          fetch-depth: 0 
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,13 +32,16 @@ jobs:
 
       - name: Commit and push JSON
         run: |
-          # Uses the official GitHub Actions Bot identity
+          # Configure bot identity
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # Pulls any recent changes to avoid push conflicts
-          git pull origin main --rebase
-          
+          # 1. Add and commit the changes FIRST
           git add news.json
           git diff-index --quiet HEAD || git commit -m "Automated AI database sync"
+          
+          # 2. THEN pull any updates to avoid conflicts
+          git pull origin main --rebase
+          
+          # 3. FINALLY push to the live database
           git push
